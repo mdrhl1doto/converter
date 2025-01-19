@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number-Word Converter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            padding: 20px;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #ee7752, #e73c7e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: titleFade 0.5s ease-in;
+        }
+
+        @keyframes titleFade {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            border: 2px solid transparent;
+            border-radius: 15px;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #23a6d5;
+            background: white;
+            box-shadow: 0 4px 20px rgba(35, 166, 213, 0.15);
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(45deg, #23a6d5, #23d5ab);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(35, 166, 213, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(35, 166, 213, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .result h2 {
+            color: #4a5568;
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .credits {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            color: #2d3748;
+            opacity: 0.8;
+            animation: fadeIn 0.5s ease-out;
+            transition: opacity 0.3s ease;
+        }
+
+        .result p {
+            color: #2d3748;
+            font-size: 1.3rem;
+            margin: 0;
+            line-height: 1.6;
+            padding: 0.5rem;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 1.5rem;
+                margin: 1rem auto;
+                width: 95%;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            input, button {
+                padding: 0.875rem;
+                font-size: 1rem;
+            }
+
+            .result p {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Number Wizard</h1>
+        <div class="input-group">
+            <input type="text" id="input" placeholder="Enter a number or word (e.g., 'forty-two' or '42')" autocomplete="off" />
+        </div>
+        <button onclick="convert()">Transform</button>
+        <div class="result">
+            <h2>Result</h2>
+            <p id="output">Your magical result will appear here</p>
+        </div>
+        <div class="credits">
+            Developed by MDRHL1.0
+        </div>
+    </div>
+
+    <script>
+        const numberWords = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+            'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+        const tensWords = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+        const scaleWords = ['', 'thousand', 'million', 'billion', 'trillion'];
+
+        function numberToWords(num) {
+            if (num === 0) return 'zero';
+            if (num < 0) return 'minus ' + numberToWords(Math.abs(num));
+
+            let words = '';
+            let scaleIndex = 0;
+
+            while (num > 0) {
+                const chunk = num % 1000;
+                if (chunk !== 0) {
+                    const chunkWords = convertChunk(chunk);
+                    words = chunkWords + (scaleWords[scaleIndex] ? ' ' + scaleWords[scaleIndex] + ' ' : '') + words;
+                }
+                num = Math.floor(num / 1000);
+                scaleIndex++;
+            }
+
+            return words.trim();
+        }
+
+        function convertChunk(num) {
+            if (num === 0) return '';
+            
+            let words = '';
+            
+            if (num >= 100) {
+                words += numberWords[Math.floor(num / 100)] + ' hundred ';
+                num %= 100;
+            }
+            
+            if (num > 0) {
+                if (words !== '') {
+                    words += 'and ';
+                }
+                
+                if (num < 20) {
+                    words += numberWords[num];
+                } else {
+                    words += tensWords[Math.floor(num / 10)];
+                    if (num % 10 > 0) {
+                        words += '-' + numberWords[num % 10];
+                    }
+                }
+            }
+            
+            return words;
+        }
+
+        function wordsToNumber(words) {
+            words = words.toLowerCase().trim();
+            if (words === 'zero') return 0;
+            if (words.startsWith('minus ')) {
+                return -wordsToNumber(words.slice(6));
+            }
+
+            const parts = words.split(' ');
+            let total = 0;
+            let currentNumber = 0;
+
+            for (let i = 0; i < parts.length; i++) {
+                const word = parts[i].replace(/-/g, ' ').trim();
+                
+                if (word === 'and') continue;
+
+                if (word === 'hundred') {
+                    currentNumber *= 100;
+                } else if (scaleWords.includes(word)) {
+                    currentNumber = (currentNumber || 1) * Math.pow(1000, scaleWords.indexOf(word));
+                    total += currentNumber;
+                    currentNumber = 0;
+                } else {
+                    const wordParts = word.split(' ');
+                    for (const part of wordParts) {
+                        if (numberWords.includes(part)) {
+                            currentNumber += numberWords.indexOf(part);
+                        } else {
+                            const tensIndex = tensWords.indexOf(part);
+                            if (tensIndex !== -1) {
+                                currentNumber += tensIndex * 10;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return total + currentNumber;
+        }
+
+        function convert() {
+            const input = document.getElementById('input').value.trim();
+            const output = document.getElementById('output');
+            
+            if (!input) {
+                output.textContent = 'Please enter a value';
+                return;
+            }
+
+            // Try converting as number first
+            const numberValue = Number(input);
+            if (!isNaN(numberValue) && String(numberValue) === input) {
+                if (Math.abs(numberValue) > 999999999999999) {
+                    output.textContent = 'Please enter a number smaller than one quadrillion';
+                    return;
+                }
+                output.textContent = numberToWords(numberValue);
+            } else {
+                // Try converting words to number
+                try {
+                    const numericResult = wordsToNumber(input);
+                    if (!isNaN(numericResult)) {
+                        output.textContent = numericResult.toLocaleString();
+                    } else {
+                        output.textContent = 'Invalid input. Please enter a valid number or word.';
+                    }
+                } catch (e) {
+                    output.textContent = 'Invalid input. Please enter a valid number or word.';
+                }
+            }
+        }
+
+        // Add keyboard support
+        document.getElementById('input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                convert();
+            }
+        });
+    </script>
+</body>
+</html>
